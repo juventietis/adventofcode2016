@@ -2,11 +2,12 @@ import re
 import itertools
 
 input_data = None
-with open("test.dat") as data:
+with open("input.dat") as data:
     input_data = data.readlines()
 
 regexp = re.compile(r"^(?P<name>[a-z\-]+)\-(?P<sector>\d+)\[(?P<checksum>\w+)\]$")
 
+sectors_sum = 0
 for line in input_data:
     matched = regexp.match(line)
     name, sector, checksum = matched.groups()
@@ -15,24 +16,16 @@ for line in input_data:
     for letter in name_wo_dashes:
         num = letters.get(letter, 0)
         letters[letter] = num + 1
-    print(name, sector, checksum)
-    print(letters)
-    sorted_letters = sorted(letters.items(), key=lambda pair: pair[1], reverse=True)
-    print(sorted_letters)
-    grouped = list(itertools.groupby(sorted_letters, key=lambda pair: pair[1]))
-    letter_count = 0
+    sorted_letters = list(sorted(list(letters.items()), key=lambda pair: pair[1], reverse=True))
+    grouped = itertools.groupby(sorted_letters, key=lambda pair: pair[1])
     checksum_letters = []
-    print([list(group) for count, group in grouped])
-    for count, grouped_letters in grouped[:5]:
-        group = list(grouped_letters)
-        print(count)
-        print(group)
-        if len(group) > 5 - letter_count:
-            group_sorted = sorted(group, key=lambda pair: pair[0])
-            checksum_letters.extend(group_sorted[:5-letter_count])
-        else:
-            checksum_letters.extend(group)
-    print ("Checksum letters: {0}".format(checksum_letters))
-    calculated_checksum = "".join([letter for letter, count in sorted_letters[0:5]])
-    print (calculated_checksum)
 
+    for count, grouped_letters in itertools.islice(grouped, 5):
+        letter_count = len(checksum_letters)
+        group = list(grouped_letters)
+        group_sorted = [l[0] for l in sorted(group, key=lambda pair: pair[0])]
+        checksum_letters.extend(group_sorted[:5-letter_count])
+    calculated_checksum = "".join(checksum_letters)
+    if calculated_checksum == checksum:
+        sectors_sum += int(sector)
+print (sectors_sum)
