@@ -5,6 +5,15 @@ input_data = None
 with open("input.dat") as data:
     input_data = data.readlines()
 
+
+def shift_letter(letter, number):
+    if letter == "-":
+        return " "
+    else:
+        current_num = ord(letter) - 97
+        new_num = (current_num + number) % 26 + 97
+        return chr(new_num)
+
 regexp = re.compile(r"^(?P<name>[a-z\-]+)\-(?P<sector>\d+)\[(?P<checksum>\w+)\]$")
 
 sectors_sum = 0
@@ -28,4 +37,7 @@ for line in input_data:
     calculated_checksum = "".join(checksum_letters)
     if calculated_checksum == checksum:
         sectors_sum += int(sector)
+        decoded_name = "".join([shift_letter(letter, int(sector)) for letter in name])
+        if decoded_name.find("north") >= 0:
+            print(decoded_name, sector)
 print (sectors_sum)
