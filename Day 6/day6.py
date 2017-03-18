@@ -11,7 +11,7 @@ for letter in messages:
         freq += 1
         frequency[repeat] = freq
     choices = list(frequency.items())
-    choices.sort(key=lambda x: x[1], reverse=True)
+    choices.sort(key=lambda x: x[1])
     real_letter = choices[0][0]
     message.append(real_letter)
 
